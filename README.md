@@ -1,6 +1,6 @@
 # Flight Data Visualizer
 
-This project analyzes personal flight history using Python and visualizes the data on an interactive map using a React and Vite-powered frontend.
+Fly Log is a React + Vite application for tracking personal flight history. Firebase Authentication and Firestore handle accounts and per-user flight records; the frontend enriches those records with airport and airline reference data and presents interactive maps, statistics, filters, AI-assisted entry, and CSV import.
 
 ## Table of Contents
 
@@ -21,8 +21,9 @@ This project analyzes personal flight history using Python and visualizes the da
 
 The application has two main parts:
 
-1.  **Data Analysis (Python):** A Python script is used to process raw flight data. It cleans the data, distances, and times, and enriches it with airport coordinates and airline information. The final output is a structured JSON file.
-2.  **Frontend (React + Vite):** A single-page application built with React and Vite consumes the JSON data. It displays the flights on an interactive map and in a sortable, filterable table. The frontend is styled using the Mantine component library.
+1. **Flight storage and enrichment:** Flights are stored per user in Firestore and enriched in the frontend using airport and airline reference datasets.
+2. **Frontend (React + Vite):** A single-page application with interactive maps, statistics, filtering, manual entry, AI-assisted entry, and CSV import. The UI uses Mantine.
+3. **Python data utilities:** Scripts in `python/` generate the airport and airline reference datasets. The app does not require a generated `flights_with_coordinates.json` file to load a user's flights.
 
 ## Tech Stack
 
@@ -36,9 +37,9 @@ Follow these instructions to get a local copy up and running.
 
 ### Prerequisites
 
-- Node.js (v18 or newer)
+- Node.js 20.19+ or 22.12+ (required by the project's Vite version)
 - npm
-- Python 3.x
+- Python 3.x and `uv` only if you need to regenerate the reference datasets
 
 ### Installation & Setup
 
@@ -49,15 +50,16 @@ Follow these instructions to get a local copy up and running.
     cd <repository-directory>
     ```
 
-2.  **Prepare the data:**
-    - Navigate to the `python` directory.
-    - Run the data processing script to generate the `flights_with_coordinates.json` file. This file is required by the frontend. You need to install the dependencies using `uv`
+2. **Configure the app:**
+   - Copy `.env.example` to `.env.local`.
+   - Fill in the Firebase `VITE_FIREBASE_*` values for your project. The app intentionally leaves authentication and Firestore uninitialized when the Firebase API key is empty.
+   - Personal flight records are loaded from Firestore; you do not need to generate a `flights_with_coordinates.json` file.
 
-3.  **Install frontend dependencies:**
+3. **Install frontend dependencies:**
 
-    ```bash
-    npm install
-    ```
+   ```bash
+   npm ci
+   ```
 
 4.  **Run the development server:**
     - This will start the app on `http://localhost:5173`. The page will automatically reload if you make changes to the source code.
@@ -139,29 +141,19 @@ This project uses two testing frameworks:
 
 Vitest is used for unit and integration testing of React components and utility functions.
 
-**Run all unit tests:**
+**Run the full unit and integration test suite:**
 
 ```bash
-npm run test
+npm run vitest
 ```
 
-**Run tests in watch mode (automatically re-runs when files change):**
+**Run tests in watch mode:**
 
 ```bash
-npm run test:watch
+npm run vitest:watch
 ```
 
-**Run tests with coverage report:**
-
-```bash
-npm run test:coverage
-```
-
-**Run tests in UI mode (interactive test runner):**
-
-```bash
-npm run test:ui
-```
+The project does not currently define coverage or Vitest UI scripts in `package.json`.
 
 ### End-to-End Testing with Cypress
 
@@ -170,22 +162,16 @@ Cypress is used for end-to-end testing of the complete application workflow.
 **Run Cypress tests in headless mode:**
 
 ```bash
-npm run cypress:run
+npm run test:e2e:headless
 ```
 
-**Open Cypress Test Runner (interactive mode):**
+**Open the interactive Cypress Test Runner:**
 
 ```bash
-npm run cypress:open
+npm run test:e2e
 ```
 
-**Run Cypress tests against production build:**
-
-```bash
-npm run build
-npm run preview
-npm run cypress:run
-```
+Cypress reads its test-account settings from `.env.local` (see `.env.example`). Configure valid test credentials before running tests that authenticate against Firebase.
 
 ### Test Structure
 
