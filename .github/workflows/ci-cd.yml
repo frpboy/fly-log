@@ -2,9 +2,9 @@ name: CI/CD
 
 on:
   push:
-    branches: [development]
+    branches: [main, development]
   pull_request:
-    branches: [development]
+    branches: [main, development]
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -24,6 +24,10 @@ jobs:
   e2e:
     name: Cypress E2E
     needs: test
+    # Forked pull requests do not receive repository secrets. Keep the
+    # secret-backed end-to-end suite for pushes and same-repository PRs;
+    # unit tests and the production build still run for external contributors.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps: 
       - uses: actions/checkout@v4
