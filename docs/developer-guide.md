@@ -29,14 +29,14 @@ Fly Log is a React + Vite single-page app backed by Firebase Auth + Firestore. A
 
 1. Prerequisites
 
-- Node.js 18+ required.
+- Node.js 20.19+ or 22.12+ required by Vite 7.
 - Python 3.9+ required for reference data scripts.
 - Firebase project configured in the Firebase console before local setup.
 
 2. Install dependencies
 
 ```
-npm install
+npm ci
 ```
 
 3. Configure environment variables
@@ -125,11 +125,26 @@ The output overwrites `src/assets/airports.json` and `src/assets/airlines.json`.
 
 ## Testing
 
-```
+Run unit and integration tests:
+
+```bash
 npm run vitest
+```
+
+Run tests in watch mode:
+
+```bash
 npm run vitest:watch
+```
+
+Run Cypress in headless mode or open its interactive runner:
+
+```bash
+npm run test:e2e:headless
 npm run test:e2e
 ```
+
+Cypress authentication tests require valid `CY_TEST_*` values in `.env.local` (see `.env.example`).
 
 ## Deployment notes
 
