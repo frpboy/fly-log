@@ -199,18 +199,7 @@ describe("MyComponent", () => {
 });
 ```
 
-```json
-{
-  "scripts": {
-    "test": "vitest",
-    "test:watch": "vitest --watch",
-    "test:coverage": "vitest --coverage",
-    "test:ui": "vitest --ui",
-    "cypress:open": "cypress open",
-    "cypress:run": "cypress run"
-  }
-}
-```
+The project's available scripts are defined in `package.json`; use the commands listed above rather than copying stale script names from older setup examples.
 
 ## Current Features
 
