@@ -19,6 +19,8 @@ jobs:
         env:
           TZ: America/New_York
         run: npm run vitest
+      - name: Lint
+        run: npm run lint
       - name: Build
         run: npm run build
   e2e:
