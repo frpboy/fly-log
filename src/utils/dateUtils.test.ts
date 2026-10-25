@@ -96,7 +96,9 @@ describe("toCalendarDay", () => {
     expect(toCalendarDay("2024-13-01")).toBeNull();
     expect(toCalendarDay("2024-00-10")).toBeNull();
     expect(toCalendarDay("")).toBeNull();
-    expect(toCalendarDay("2024/07/10")).toBe("2024-07-10");
+    expect(toCalendarDay("2024/07/10")).toBeNull();
+    expect(toCalendarDay("not-a-date")).toBeNull();
+    expect(toCalendarDay("2024-07-10T23:55:00+14:00")).toBe("2024-07-10");
   });
 
   it("keeps the same calendar day for Date and Firestore Timestamp-like values", () => {
