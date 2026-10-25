@@ -180,7 +180,7 @@ const AIRCRAFT_MANUFACTURERS = [
 ];
 
 export const splitAircraftLabel = (value) => {
-  const label = String(value ?? "").trim().replace(/\\s+/g, " ");
+  const label = String(value ?? "").trim().replace(/\s+/g, " ");
   if (!label) return [""];
 
   const manufacturer = AIRCRAFT_MANUFACTURERS.find((candidate) =>
