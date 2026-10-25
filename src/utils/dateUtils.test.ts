@@ -89,4 +89,22 @@ describe("toCalendarDay", () => {
     expect(toCalendarDay("2026-07-10")).toBe("2026-07-10");
     expect(toCalendarDay(null)).toBeNull();
   });
+  it("preserves valid calendar-day strings and rejects impossible dates", () => {
+    expect(toCalendarDay("2024-02-29")).toBe("2024-02-29");
+    expect(toCalendarDay("2025-02-29")).toBeNull();
+    expect(toCalendarDay("2024-02-30")).toBeNull();
+    expect(toCalendarDay("2024-13-01")).toBeNull();
+    expect(toCalendarDay("2024-00-10")).toBeNull();
+    expect(toCalendarDay("")).toBeNull();
+    expect(toCalendarDay("2024/07/10")).toBe("2024-07-10");
+  });
+
+  it("keeps the same calendar day for Date and Firestore Timestamp-like values", () => {
+    const date = new Date(Date.UTC(2024, 2, 10));
+    expect(toCalendarDay(date)).toBe("2024-03-10");
+    expect(
+      toCalendarDay({ toDate: () => new Date(Date.UTC(2024, 2, 10)) }),
+    ).toBe("2024-03-10");
+  });
+
 });

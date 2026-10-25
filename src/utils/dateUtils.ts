@@ -105,7 +105,20 @@ export function formatCalendarDate(
  */
 export function toCalendarDay(value: unknown): string | null {
   if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    return value;
+    // A shape-only regex accepts impossible days such as 2024-02-30. Validate
+    // the calendar components without parsing the string as a local-time Date.
+    const [year, month, day] = value.split("-").map(Number);
+    const candidate = new Date(0);
+    candidate.setUTCFullYear(year, month - 1, day);
+    candidate.setUTCHours(0, 0, 0, 0);
+    if (
+      candidate.getUTCFullYear() === year &&
+      candidate.getUTCMonth() === month - 1 &&
+      candidate.getUTCDate() === day
+    ) {
+      return value;
+    }
+    return null;
   }
   const d = parseToDate(value);
   if (!d) return null;
