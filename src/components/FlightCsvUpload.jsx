@@ -162,6 +162,7 @@ const FlightCsvUpload = ({ onComplete }) => {
             arrival_airport_iata: flight.arrival_airport_iata,
             airline_iata: flight.airline_iata,
             flight_number: flight.flight_number || null,
+            aircraft_type_name: flight.aircraft_type_name?.trim() || null,
           }));
 
           let lastProgress = 0;
