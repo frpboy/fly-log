@@ -60,6 +60,19 @@ describe("FlightsByChart", () => {
     ]);
   });
 
+  it("does not draw a zero-flight aircraft bar when aircraft data is unknown", () => {
+    applyMockState({ chartGrouping: CHART_GROUPING.AIRCRAFT });
+    render(
+      <FlightsByChart
+        filteredFlights={[{ id: "unknown-1" }, { id: "unknown-2" }]}
+      />,
+    );
+
+    expect(screen.queryByTestId("bar-chart")).toBeNull();
+    expect(screen.getByText(/No aircraft model data yet/i)).toBeInTheDocument();
+    expect(screen.getByText(/Based on 0 of 2 flights/i)).toBeInTheDocument();
+  });
+
   it("aggregates by distance flown when the shared metric is distance", () => {
     applyMockState({ chartMetric: CHART_METRIC.DISTANCE });
     render(<FlightsByChart filteredFlights={flights} />);

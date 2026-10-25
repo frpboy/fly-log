@@ -166,6 +166,35 @@ export const getFlightsByAircraft = (flights, metric) => {
   return [...groups.values()].sort((a, b) => b.flights - a.flights);
 };
 
+// Split aircraft labels on a known manufacturer prefix so multiword names
+// remain readable in the two-line chart axis (including Italian UI layouts).
+const AIRCRAFT_MANUFACTURERS = [
+  "De Havilland Canada",
+  "Bombardier",
+  "Airbus",
+  "Boeing",
+  "Embraer",
+  "ATR",
+  "Fokker",
+  "Saab",
+];
+
+export const splitAircraftLabel = (value) => {
+  const label = String(value ?? "").trim().replace(/\\s+/g, " ");
+  if (!label) return [""];
+
+  const manufacturer = AIRCRAFT_MANUFACTURERS.find((candidate) =>
+    label.toLowerCase().startsWith(`${candidate.toLowerCase()} `),
+  );
+  if (manufacturer) {
+    const model = label.slice(manufacturer.length).trim();
+    return model ? [manufacturer, model] : [manufacturer];
+  }
+
+  const [first, ...rest] = label.split(" ");
+  return rest.length ? [first, rest.join(" ")] : [label];
+};
+
 // Build a year x month matrix for the Timeline heatmap, totalling either
 // flights or kilometres per month. Returns the sorted list of years (oldest
 // first) and a `counts` map of year -> number[12] (Jan..Dec, UTC).
