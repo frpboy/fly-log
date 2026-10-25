@@ -67,7 +67,11 @@ describe("verifyAppCheckToken", () => {
 
     const result = await verifyAppCheckToken("a.b.c");
 
-    expect(result).toMatchObject({ ok: false, status: 401 });
+    expect(result).toMatchObject({
+      ok: false,
+      status: 401,
+      error: "Request could not be verified",
+    });
   });
 
   it("fails closed, not open, when the project is not configured", async () => {
@@ -77,7 +81,12 @@ describe("verifyAppCheckToken", () => {
 
     const result = await verifyAppCheckToken("a.b.c");
 
-    expect(result).toMatchObject({ ok: false, status: 500 });
+    expect(result).toMatchObject({
+      ok: false,
+      status: 500,
+      error: "Request verification is temporarily unavailable",
+    });
+    expect(JSON.stringify(result)).not.toContain("fly-log-test");
     expect(joseMocks.jwtVerify).not.toHaveBeenCalled();
   });
 });

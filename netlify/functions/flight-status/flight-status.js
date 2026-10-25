@@ -42,7 +42,9 @@ export const handler = async (event) => {
 
   const apiKey = process.env.RAPIDAPI_AERODATABOX_KEY;
   if (!apiKey) {
-    return jsonError(500, "AeroDataBox API key is not configured");
+    // Keep deployment configuration details in logs, not the public response.
+    console.error("AeroDataBox API key is not configured");
+    return jsonError(500, "Flight status is temporarily unavailable");
   }
 
   const url = `https://${AERODATABOX_HOST}/flights/number/${encodeURIComponent(flightNumber)}/${encodeURIComponent(date)}`;

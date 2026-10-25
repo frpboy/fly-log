@@ -68,10 +68,15 @@ describe("flight-status function", () => {
 
   it("returns 500 when the API key is not configured", async () => {
     delete process.env.RAPIDAPI_AERODATABOX_KEY;
+    vi.spyOn(console, "error").mockImplementation(() => {});
     const result = await handler({
       queryStringParameters: { flightNumber: "QF1", date: "2026-09-20" },
     });
     expect(result.statusCode).toBe(500);
+    expect(JSON.parse(result.body)).toEqual({
+      error: "Flight status is temporarily unavailable",
+    });
+    expect(result.body).not.toContain("AeroDataBox API key");
   });
 
   it("proxies AeroDataBox's response and status code unchanged", async () => {
