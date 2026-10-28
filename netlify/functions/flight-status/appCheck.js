@@ -32,11 +32,11 @@ export const verifyAppCheckToken = async (token) => {
     console.error(
       "App Check cannot be verified: VITE_FIREBASE_MESSAGING_SENDER_ID or VITE_FIREBASE_PROJECT_ID is not set for this function",
     );
-    return { ok: false, status: 500, error: "App Check is not configured" };
+    return { ok: false, status: 500, error: "Request verification is temporarily unavailable" };
   }
 
   if (!token) {
-    return { ok: false, status: 401, error: "Missing App Check token" };
+    return { ok: false, status: 401, error: "Request could not be verified" };
   }
 
   try {
@@ -50,6 +50,6 @@ export const verifyAppCheckToken = async (token) => {
     // Expected for an expired or replayed token, so this is not an error the
     // operator needs to act on - but the reason is worth having in the log.
     console.warn("App Check verification failed:", err?.code ?? err?.message);
-    return { ok: false, status: 401, error: "Invalid App Check token" };
+    return { ok: false, status: 401, error: "Request could not be verified" };
   }
 };
