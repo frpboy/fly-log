@@ -20,6 +20,9 @@ import {
 } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import "./i18n"; // initialize i18n
+import { initializeWebVitals } from "./utils/webVitals";
+
+initializeWebVitals();
 
 const FlightsStats = lazy(() => import("./pages/FlightsStats.jsx"));
 const About = lazy(() => import("./pages/About.jsx"));
