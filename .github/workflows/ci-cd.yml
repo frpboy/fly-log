@@ -8,6 +8,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        timezone:
+          - America/New_York
+          - America/Los_Angeles
+          - Pacific/Kiritimati
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -15,11 +22,12 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - name: Run unit tests
+      - name: Run unit tests (${{ matrix.timezone }})
         env:
-          TZ: America/New_York
+          TZ: ${{ matrix.timezone }}
         run: npm run vitest
       - name: Build
+        if: matrix.timezone == 'America/New_York'
         run: npm run build
   e2e:
     name: Cypress E2E

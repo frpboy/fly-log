@@ -104,8 +104,27 @@ export function formatCalendarDate(
  * gives the previous day anywhere west of UTC.
  */
 export function toCalendarDay(value: unknown): string | null {
-  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    return value;
+  if (typeof value === "string") {
+    // Date-only values must be ISO calendar dates, not ambiguous local strings
+    // like "2024/07/10". For ISO timestamps keep the encoded calendar date
+    // instead of converting an instant through the machine's local timezone.
+    const match = value.match(/^(\d{4}-\d{2}-\d{2})(?:$|T)/i);
+    if (!match) return null;
+
+    const calendarDay = match[1];
+    const [year, month, day] = calendarDay.split("-").map(Number);
+    const candidate = new Date(0);
+    candidate.setUTCFullYear(year, month - 1, day);
+    candidate.setUTCHours(0, 0, 0, 0);
+    if (
+      candidate.getUTCFullYear() !== year ||
+      candidate.getUTCMonth() !== month - 1 ||
+      candidate.getUTCDate() !== day
+    ) {
+      return null;
+    }
+    if (value.length > 10 && !parseToDate(value)) return null;
+    return calendarDay;
   }
   const d = parseToDate(value);
   if (!d) return null;
