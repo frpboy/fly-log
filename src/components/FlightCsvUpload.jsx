@@ -19,6 +19,7 @@ import Papa from "papaparse";
 import { useTranslation } from "react-i18next";
 import { validateAndNormalizeCsvRows } from "../utils/iataValidation";
 import { CABIN_CLASSES } from "../utils/emissions";
+import { normalizeAircraftName } from "../utils/aircraft";
 
 export const validateCsvData = (data) => {
   const errors = [];
@@ -162,6 +163,7 @@ const FlightCsvUpload = ({ onComplete }) => {
             arrival_airport_iata: flight.arrival_airport_iata,
             airline_iata: flight.airline_iata,
             flight_number: flight.flight_number || null,
+            aircraft_type_name: normalizeAircraftName(flight.aircraft_type_name),
           }));
 
           let lastProgress = 0;

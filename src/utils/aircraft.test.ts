@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { AIRCRAFT_NAMES, aircraftFamily, findAircraftName } from "./aircraft";
+import {
+  AIRCRAFT_NAMES,
+  aircraftFamily,
+  findAircraftName,
+  normalizeAircraftName,
+} from "./aircraft";
 
 describe("aircraftFamily", () => {
   it("groups variants, with or without the variant reported", () => {
@@ -39,5 +44,21 @@ describe("findAircraftName", () => {
 
   it("lists every name once", () => {
     expect(new Set(AIRCRAFT_NAMES).size).toBe(AIRCRAFT_NAMES.length);
+  });
+});
+
+
+describe("normalizeAircraftName", () => {
+  it("uses the catalogue spelling for known aircraft", () => {
+    expect(normalizeAircraftName(" airbus a320 neo ")).toBe("Airbus A320neo");
+  });
+
+  it("preserves trimmed names that are not in the catalogue", () => {
+    expect(normalizeAircraftName(" Comac C919-100 ")).toBe("Comac C919-100");
+  });
+
+  it("treats blank or non-string values as absent", () => {
+    expect(normalizeAircraftName("   ")).toBeNull();
+    expect(normalizeAircraftName(undefined)).toBeNull();
   });
 });

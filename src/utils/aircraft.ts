@@ -127,3 +127,16 @@ export const aircraftFamily = (name: unknown): string | null => {
   const family = name.split("-")[0]!.replace(/\s+/g, " ").trim();
   return family || null;
 };
+
+
+/**
+ * Normalize an imported aircraft name to the catalogue spelling when known.
+ * Keep an unlisted name (trimmed) so the aircraft chart can apply its fallback
+ * family grouping instead of silently discarding the user's data.
+ */
+export const normalizeAircraftName = (name: unknown): string | null => {
+  if (typeof name !== "string") return null;
+  const trimmed = name.trim();
+  if (!trimmed) return null;
+  return findAircraftName(trimmed) ?? trimmed;
+};

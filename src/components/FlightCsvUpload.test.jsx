@@ -2,6 +2,23 @@ import { screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render } from "../../test-utils/index.js";
 
+const testAuth = vi.hoisted(() => ({ user: null }));
+
+vi.mock("../context/AuthContext.jsx", () => ({
+  useAuth: () => ({ user: testAuth.user }),
+}));
+
+vi.mock("../utils/iataValidation", () => ({
+  validateAndNormalizeCsvRows: vi.fn(async (rows) => ({
+    errors: [],
+    normalizedRows: rows,
+  })),
+}));
+
+vi.mock("../utils/autoStatusCheck", () => ({
+  autoCheckSavedFlights: vi.fn(),
+}));
+
 // Mock firebaseClient
 vi.mock("../firebaseClient", () => ({
   addFlightsForUser: vi
@@ -28,10 +45,12 @@ vi.mock("papaparse", () => ({
 
 import FlightCsvUpload, { validateCsvData } from "./FlightCsvUpload";
 import Papa from "papaparse";
+import { addFlightsForUser } from "../firebaseClient";
 
 describe("FlightCsvUpload", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    testAuth.user = null;
   });
 
   it("renders input and button", () => {
@@ -119,4 +138,50 @@ describe("FlightCsvUpload", () => {
       ),
     ).toBe(true);
   });
+  it("imports the optional aircraft column and preserves unlisted aircraft names", async () => {
+    testAuth.user = { uid: "test-user" };
+    Papa.parse.mockImplementation((file, options) => {
+      options.complete({
+        data: [
+          {
+            departure_date: "2026-07-10",
+            departure_time: "09:00",
+            departure_airport_iata: "SYD",
+            arrival_airport_iata: "SIN",
+            airline_iata: "QF",
+            flight_number: "QF1",
+            cabin_class: "business",
+            aircraft_type_name: " airbus a320 neo ",
+          },
+          {
+            departure_date: "2026-07-11",
+            departure_time: "10:00",
+            departure_airport_iata: "SIN",
+            arrival_airport_iata: "SYD",
+            airline_iata: "QF",
+            flight_number: "QF2",
+            aircraft_type_name: " Comac C919-100 ",
+          },
+        ],
+      });
+    });
+
+    render(<FlightCsvUpload />);
+    const file = new File(["csv"], "flights.csv", { type: "text/csv" });
+    fireEvent.change(screen.getByLabelText(/Flight data CSV/i), {
+      target: { files: [file] },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Upload Flights/i }));
+
+    await waitFor(() => {
+      expect(addFlightsForUser).toHaveBeenCalledTimes(1);
+    });
+
+    const savedFlights = addFlightsForUser.mock.calls[0][1];
+    expect(savedFlights.map((flight) => flight.aircraft_type_name)).toEqual([
+      "Airbus A320neo",
+      "Comac C919-100",
+    ]);
+  });
+
 });
