@@ -55,7 +55,7 @@
   },
   "csv": {
     "title": "Carica dati volo da CSV",
-    "description": "Il tuo CSV deve includere queste colonne: departure_date, departure_time, departure_airport_iata, arrival_airport_iata, airline_iata. Opzionale: flight_number, arrival_date, arrival_time, cabin_class (economy, premium_economy, business, first).",
+    "description": "Il CSV deve includere queste colonne: departure_date, departure_airport_iata, arrival_airport_iata, airline_iata. Facoltativi: departure_time, arrival_date, arrival_time, flight_number, cabin_class (economy, premium_economy, business, first), aircraft_type_name.",
     "file_input": {
       "placeholder": "Seleziona file CSV",
       "label": "CSV dati volo",
@@ -409,5 +409,12 @@
     "keep_mine": "Mantieni i miei",
     "source": "Verificato una volta con AeroDataBox perché il volo è entro una settimana.",
     "apply_failed": "Impossibile aggiornare il volo. Riprova."
+  },
+  "export": {
+    "button": "Esporta voli",
+    "all": "Tutti i voli",
+    "filtered": "Voli filtrati",
+    "csv": "Scarica CSV",
+    "json": "Scarica JSON"
   }
 }

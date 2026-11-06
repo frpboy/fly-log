@@ -38,7 +38,7 @@
   "flight_time": "{{hours}}h {{minutes}}m flight time",
   "csv": {
     "title": "Upload Flight Data from CSV",
-    "description": "Your CSV must include these columns: departure_date, departure_time, departure_airport_iata, arrival_airport_iata, airline_iata. Optional: flight_number, arrival_date, arrival_time, cabin_class (economy, premium_economy, business, first).",
+    "description": "Your CSV must include these columns: departure_date, departure_airport_iata, arrival_airport_iata, airline_iata. Optional: departure_time, arrival_date, arrival_time, flight_number, cabin_class (economy, premium_economy, business, first), aircraft_type_name.",
     "file_input": {
       "placeholder": "Select CSV file",
       "label": "Flight data CSV",
@@ -409,5 +409,12 @@
     "keep_mine": "Keep mine",
     "source": "Checked once with AeroDataBox because the flight is within a week.",
     "apply_failed": "Could not update the flight. Please try again."
+  },
+  "export": {
+    "button": "Export flights",
+    "all": "All flights",
+    "filtered": "Filtered flights",
+    "csv": "Download CSV",
+    "json": "Download JSON"
   }
 }
