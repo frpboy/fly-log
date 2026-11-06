@@ -4,6 +4,7 @@ import {
   getFlightsByTimeGrouping,
   getFlightsByAirline,
   getFlightsByAircraft,
+  splitAircraftLabel,
   getFlightMonthMatrix,
   getMonthMatrixStats,
   formatMetricValue,
@@ -171,6 +172,25 @@ describe("getFlightsByAirline", () => {
     expect(out).toHaveLength(1);
     expect(out[0].airline).toBe("American");
     expect(out[0].flights).toBe(1);
+  });
+});
+
+describe("splitAircraftLabel", () => {
+  it("keeps multiword manufacturer names together and wraps long models", () => {
+    expect(splitAircraftLabel("De Havilland Canada Dash 8")).toEqual([
+      "De Havilland Canada",
+      "Dash 8",
+    ]);
+    expect(splitAircraftLabel("Boeing 787-10")).toEqual(["Boeing", "787-10"]);
+    expect(splitAircraftLabel("Airbus A321neo")).toEqual(["Airbus", "A321neo"]);
+  });
+
+  it("handles blank and unknown labels without throwing", () => {
+    expect(splitAircraftLabel("")).toEqual([""]);
+    expect(splitAircraftLabel("Regional Jet Model X")).toEqual([
+      "Regional",
+      "Jet Model X",
+    ]);
   });
 });
 
@@ -355,6 +375,16 @@ describe("getFlightsByAircraft", () => {
   it("returns an empty array for empty or missing input", () => {
     expect(getFlightsByAircraft([])).toEqual([]);
     expect(getFlightsByAircraft(null)).toEqual([]);
+  });
+
+  it("returns no synthetic zero-count aircraft bucket when every aircraft is unknown", () => {
+    expect(
+      getFlightsByAircraft([
+        {},
+        { aircraft_type_name: null },
+        { flight_status: { aircraft: { model: null } } },
+      ]),
+    ).toEqual([]);
   });
 
   it("groups direct aircraft names and saved flight-status models", () => {

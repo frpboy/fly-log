@@ -6,7 +6,9 @@ import {
   SegmentedControl,
   ScrollArea,
   Text,
+  Box,
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { BarChart } from "@mantine/charts";
 import {
   getDeparturesByCountry,
@@ -16,6 +18,7 @@ import {
   getFlightsByAirport,
   formatCompactValue,
   labelFitsInsideBar,
+  splitAircraftLabel,
 } from "../utils/chartUtils.js";
 import { useTranslation } from "react-i18next";
 import {
@@ -77,8 +80,7 @@ const makeBarValueLabel = (locale) =>
 // Aircraft names are long ("Airbus A320 NEO"), so the maker goes on its own
 // line above the model rather than widening the axis, which phones can't spare.
 const AircraftTick = ({ x, y, payload }) => {
-  const [maker, ...model] = String(payload.value).split(" ");
-  const lines = model.length ? [maker, model.join(" ")] : [maker];
+  const lines = splitAircraftLabel(payload.value);
   return (
     // Same offset and colour as Mantine's own ticks.
     <text
@@ -156,6 +158,7 @@ const FlightsByChart = ({ filteredFlights, data, height }) => {
     [filteredFlights, currentGroupingConfig, metric],
   );
   const isAircraft = grouping === CHART_GROUPING.AIRCRAFT;
+  const isNarrowScreen = useMediaQuery("(max-width: 30em)");
   // Only flights with a known aircraft make it into that chart, so say how many.
   const aircraftKnown = useMemo(
     () =>
@@ -244,38 +247,46 @@ const FlightsByChart = ({ filteredFlights, data, height }) => {
         />
         {metricControl}
       </Stack>
-      <ScrollArea h={370} scrollbars="y" type="always" offsetScrollbars>
+      <ScrollArea
+        h={370}
+        scrollbars={isAircraft && isNarrowScreen ? "xy" : "y"}
+        type="always"
+        offsetScrollbars
+      >
         {isAircraft && chartData.length === 0 ? (
           <Text size="sm" c="dimmed">
             {t("charts.no_aircraft_data")}
           </Text>
         ) : (
-          <BarChart
-            h={(chartData.length + 1) * 28}
-            data={chartData}
-            withBarValueLabel
-            valueLabelProps={valueLabelProps}
-            dataKey={currentGroupingConfig.dataKey}
-            orientation="vertical"
-            yAxisProps={{
-              width: 100,
-              ...(isAircraft && { tick: AircraftTick }),
-            }}
-            withXAxis={false}
-            gridAxis="none"
-            barProps={{ radius: 8, barSize: 23 }}
-            series={[
-              {
-                name: currentGroupingConfig.seriesName,
-                color: "accent.4",
-              },
-            ]}
-            withTooltip={false}
-          />
+          <Box miw={isAircraft && isNarrowScreen ? 560 : undefined}>
+            <BarChart
+              h={(chartData.length + 1) * 28}
+              data={chartData}
+              withBarValueLabel
+              valueLabelProps={valueLabelProps}
+              dataKey={currentGroupingConfig.dataKey}
+              orientation="vertical"
+              yAxisProps={{
+                width: isAircraft ? (isNarrowScreen ? 168 : 210) : 100,
+                ...(isAircraft && { tick: AircraftTick }),
+              }}
+              withXAxis={false}
+              gridAxis="none"
+              barProps={{ radius: 8, barSize: 23 }}
+              series={[
+                {
+                  name: currentGroupingConfig.seriesName,
+                  color: "accent.4",
+                },
+              ]}
+              withTooltip={false}
+            />
+          </Box>
         )}
       </ScrollArea>
       {isAircraft &&
-        aircraftKnown > 0 &&
+        Array.isArray(filteredFlights) &&
+        filteredFlights.length > 0 &&
         aircraftKnown < filteredFlights.length && (
           <Text size="xs" c="dimmed" mt="xs">
             {t("charts.aircraft_subset", {
